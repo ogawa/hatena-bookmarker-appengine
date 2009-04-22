@@ -1,0 +1,4 @@
+hatena_username: user
+hatena_password: passwd
+feeds:
+ - http://feeds2.feedburner.com/ogawa

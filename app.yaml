@@ -1,0 +1,10 @@
+application: hatena-bookmarker
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /hatena_bookmarker
+  script: hatena_bookmarker.py
+- url: .*
+  script: root.py

@@ -1,0 +1,4 @@
+cron:
+- description: daily hatena bookmarking
+  url: /hatena_bookmarker
+  schedule: every 24 hours
