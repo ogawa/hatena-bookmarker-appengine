@@ -85,7 +85,7 @@ class HatenaBookmarkClient():
   def updateBookmark(self, edit_uri, title=u'', summary=u''):
     if len(title) == 0 and len(summary) == 0:
       raise Exception('Both of title and summary are not defined')
-    payload = self.__createSenderXML(title=title, summary=summary)
+    payload = self.__createBookmarkPayload(title=title, summary=summary)
     res = self.makeRequest(edit_uri, method='PUT', payload=payload)
     return res.content
 
