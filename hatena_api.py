@@ -12,7 +12,7 @@ class HatenaBookmarkClient():
   def __init__(self, username, password):
     self.username = username
     self.password = password
-    self.wsse = None
+    self.wsse_token = None
 
   def createBookmarkPayload(self, url='', title=u'', summary=u''):
     impl = minidom.getDOMImplementation()
@@ -44,7 +44,7 @@ class HatenaBookmarkClient():
     created = datetime.datetime.now().isoformat() + 'Z'
     password_digest = sha.sha(nonce + created + self.password).digest()
     password_digest_enc = base64.encodestring(password_digest).strip()
-    self.wsse = 'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"' % (self.username, password_digest_enc, nonce_enc, created)
+    self.wsse_token = 'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"' % (self.username, password_digest_enc, nonce_enc, created)
 
   def makeRequest(self, url, payload='', method='GET', content_type='text/xml'):
     self.createWSSEToken()
@@ -53,7 +53,7 @@ class HatenaBookmarkClient():
       payload = payload,
       method = method,
       headers = {
-        'X-WSSE': self.wsse,
+        'X-WSSE': self.wsse_token,
         'Content-Type': content_type,
         'Authorization': 'WSSE profile="UsernameToken"',
         'User-Agent': 'Python-HatenaBookmarkClient/1.0'
@@ -76,6 +76,7 @@ class HatenaBookmarkClient():
 
   def getBookmark(self, edit_uri):
     res = self.makeRequest(edit_uri, method='GET')
+    """ do something here """
     return res.content
 
   def updateBookmark(self, edit_uri, title=u'', summary=u''):
@@ -83,8 +84,10 @@ class HatenaBookmarkClient():
       raise Exception('Both of title and summary are not defined')
     payload = self.createBookmarkPayload(title=title, summary=summary)
     res = self.makeRequest(edit_uri, method='PUT', payload=payload)
+    """ do something here """
     return res.content
 
   def deleteBookmark(self, edit_uri):
     res = self.makeRequest(edit_uri, method='DELETE')
+    """ do something here """
     return res.content
