@@ -19,25 +19,21 @@ class HatenaBookmarkClient():
     doc = impl.createDocument(None, 'entry', None)
     root = doc.documentElement
     root.attributes['xmlns'] = 'http://purl.org/atom/ns#'
-
     if url:
       elem = doc.createElement('link')
       elem.setAttribute('rel', 'related')
       elem.setAttribute('type', 'text/html')
       elem.setAttribute('href', url)
       root.appendChild(elem)
-
     if title:
       elem = doc.createElement('title')
       elem.appendChild(doc.createTextNode(title))
       root.appendChild(elem)
-
     if summary:
       elem = doc.createElement('summary')
       elem.setAttribute('type', 'text/plain')
       elem.appendChild(doc.createTextNode(summary))
       root.appendChild(elem)
-
     payload = doc.toxml(encoding='utf-8')
     doc.unlink()
     return payload
@@ -68,7 +64,7 @@ class HatenaBookmarkClient():
     return res
 
   def postBookmark(self, url, summary=u''):
-    payload = self.__createBookmarkPayload(url, summary=summary)
+    payload = self.__createBookmarkPayload(url=url, summary=summary)
     res = self.makeRequest(self.post_uri, method='POST', payload=payload)
 
     doc = minidom.parseString(res.content.lstrip())
