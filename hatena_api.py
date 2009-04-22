@@ -14,7 +14,7 @@ class HatenaBookmarkClient():
     self.password = password
     self.wsse = None
 
-  def __createBookmarkPayload(self, url='', title=u'', summary=u''):
+  def createBookmarkPayload(self, url='', title=u'', summary=u''):
     impl = minidom.getDOMImplementation()
     doc = impl.createDocument(None, 'entry', None)
     root = doc.documentElement
@@ -38,7 +38,7 @@ class HatenaBookmarkClient():
     doc.unlink()
     return payload
 
-  def __createWSSEToken(self):
+  def createWSSEToken(self):
     nonce = sha.sha(str(time.time() + random.random())).digest()
     nonce_enc = base64.encodestring(nonce).strip()
     created = datetime.datetime.now().isoformat() + 'Z'
@@ -47,7 +47,7 @@ class HatenaBookmarkClient():
     self.wsse = 'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"' % (self.username, password_digest_enc, nonce_enc, created)
 
   def makeRequest(self, url, payload='', method='GET', content_type='text/xml'):
-    self.__createWSSEToken()
+    self.createWSSEToken()
     res = urlfetch.fetch(
       url,
       payload = payload,
@@ -64,7 +64,7 @@ class HatenaBookmarkClient():
     return res
 
   def postBookmark(self, url, summary=u''):
-    payload = self.__createBookmarkPayload(url=url, summary=summary)
+    payload = self.createBookmarkPayload(url=url, summary=summary)
     res = self.makeRequest(self.post_uri, method='POST', payload=payload)
 
     doc = minidom.parseString(res.content.lstrip())
@@ -81,7 +81,7 @@ class HatenaBookmarkClient():
   def updateBookmark(self, edit_uri, title=u'', summary=u''):
     if len(title) == 0 and len(summary) == 0:
       raise Exception('Both of title and summary are not defined')
-    payload = self.__createBookmarkPayload(title=title, summary=summary)
+    payload = self.createBookmarkPayload(title=title, summary=summary)
     res = self.makeRequest(edit_uri, method='PUT', payload=payload)
     return res.content
 
