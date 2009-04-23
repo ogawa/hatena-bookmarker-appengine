@@ -6,5 +6,6 @@ api_version: 1
 handlers:
 - url: /hatena_bookmarker
   script: hatena_bookmarker.py
+  login: admin
 - url: .*
   script: root.py
