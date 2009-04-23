@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from google.appengine.ext import webapp
-from google.appengine.api import urlfetch
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import os
@@ -34,7 +33,7 @@ class HatenaBookmarkerHandler(webapp.RequestHandler):
         for tag in entry.tags:
           summary += '[' + tag.term + ']'
         try:
-          api.postBookmark(entry_url, summary)
+          api.postBookmark(entry_url, summary=summary)
           logging.info("Succeeded to post bookmark: %s" % entry_url)
           self.response.out.write("Succeeded to post bookmark: %s\n" % entry_url)
         except Exception, e:
