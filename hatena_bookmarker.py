@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-
 import os
 import yaml
 import logging
 import feedparser
 from hatena_api import HatenaBookmarkClient
+from google.appengine.ext import db
+from google.appengine.ext import webapp
+from google.appengine.ext.webapp.util import run_wsgi_app
+
+class HatenaBookmark(db.Model):
+  url = db.StringProperty(required=True)
+  title = db.StringProperty()
+  summary = db.StringProperty()
+  editURI = db.StringProperty()
 
 class HatenaBookmarkerHandler(webapp.RequestHandler):
   def get(self):
@@ -28,18 +34,21 @@ class HatenaBookmarkerHandler(webapp.RequestHandler):
         pass
 
       for entry in feed.entries:
-        entry_url = entry.link
+        url = entry.link
+        if HatenaBookmark.gql('WHERE url = :url', url=url).get():
+          continue
         summary = ''
         for tag in entry.tags:
           summary += '[' + tag.term + ']'
         try:
-          api.postBookmark(entry_url, summary=summary)
-          logging.info("Succeeded to post bookmark: %s" % entry_url)
-          self.response.out.write("Succeeded to post bookmark: %s\n" % entry_url)
+          editURI = api.postBookmark(url, summary=summary)
+          HatenaBookmark(url=url, summary=summary, editURI=editURI).put()
+          logging.info("Succeeded to post bookmark: %s" % url)
+          self.response.out.write("Succeeded to post bookmark: %s\n" % url)
         except Exception, e:
           logging.error(e)
-          logging.info("Failed to post bookmark: %s" % entry_url)
-          self.response.out.write("Failed to post bookmark: %s\n" % entry_url)
+          logging.info("Failed to post bookmark: %s" % url)
+          self.response.out.write("Failed to post bookmark: %s\n" % url)
           pass
 
 def get_config():

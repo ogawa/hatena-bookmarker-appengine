@@ -2,6 +2,7 @@
 
 # for creating WSSE header
 import time, random, datetime, base64, sha
+import re
 
 from xml.dom import minidom
 from google.appengine.api import urlfetch
@@ -66,13 +67,10 @@ class HatenaBookmarkClient():
   def postBookmark(self, url, summary=u''):
     payload = self.createBookmarkPayload(url=url, summary=summary)
     res = self.makeRequest(self.post_uri, method='POST', payload=payload)
-
-    doc = minidom.parseString(res.content.lstrip())
-    entry = doc.getElementsByTagName('entry').item(0)
-    links = entry.getElementsByTagName('link')
-    for link in links:
-      if link.getAttribute('rel') == 'service.edit':
-        return link.getAttribute('href')
+    editURI = res.headers['Location']
+    if not re.match('http://', editURI):
+      editURI = 'http://b.hatena.ne.jp/' + editURI
+    return editURI
 
   def getBookmark(self, edit_uri):
     res = self.makeRequest(edit_uri, method='GET')
