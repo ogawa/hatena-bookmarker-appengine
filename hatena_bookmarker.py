@@ -38,8 +38,9 @@ class HatenaBookmarkerHandler(webapp.RequestHandler):
         if HatenaBookmark.gql('WHERE url = :url', url=url).get():
           continue
         summary = ''
-        for tag in entry.tags:
-          summary += '[' + tag.term + ']'
+        if hasattr(entry, 'tags'):
+          for tag in entry.tags:
+            summary += '[' + tag.term + ']'
         try:
           editURI = api.postBookmark(url, summary=summary)
           HatenaBookmark(url=url, summary=summary, editURI=editURI).put()
